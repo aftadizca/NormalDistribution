@@ -7,6 +7,7 @@ package normaldistribution;
 
 import java.awt.Color;
 import java.awt.event.ItemEvent;
+import java.util.Scanner;
 
 /**
  *
@@ -17,51 +18,22 @@ public class GUI extends javax.swing.JFrame {
     /**
      * Creates new form GUI
      */
-    
-    private double xX;
-    private double rR;
-    private double sB;
-    double maxZ = 5.0;
-    double minZ = -5.0;
-
-    public double getxX() {
-        return xX;
-    }
-
-    public void setxX(double xX) {
-        this.xX = xX;
-    }
-
-    public double getrR() {
-        return rR;
-    }
-
-    public void setrR(double rR) {
-        this.rR = rR;
-    }
-
-    public double getsB() {
-        return sB;
-    }
-
-    public void setsB(double sB) {
-        this.sB = sB;
-    }
-    
-    public double getNormalProbabilityAtZ(double z) {
+    public double minZ = -5.0;
+    public double maxZ = 5.0;
+    public double getNormalProbabilityAtZ(double z, double s) {
         return Math.exp(-Math.pow(z, 2) / 2) / Math.sqrt(2 * Math.PI);
     }
     
     public double getZ(double x,double r,double s) {
-        return (x-r)/s;
+        return Double.parseDouble(String.format("%.2f", (x-r)/s));
     }
     
-    double getAreaUnderNormalCurve(double z1, double z2) {
+    double getAreaUnderNormalCurve(double z1, double z2, double s) {
         double area = 0.0;
         final int rectangles = 100000; // more rectangles = more precise, less rectangles = quicker execution
         final double width = (z2 - z1) / rectangles;
         for(int i = 0; i < rectangles; i++)
-            area += width * getNormalProbabilityAtZ(width * i + z1);
+            area += width * getNormalProbabilityAtZ(width * i + z1,s);
         return area;
     }
     
@@ -69,6 +41,7 @@ public class GUI extends javax.swing.JFrame {
     
     public GUI() {
         initComponents();
+        Z2.setVisible(false);
     }
 
     /**
@@ -95,9 +68,9 @@ public class GUI extends javax.swing.JFrame {
         jRadioButton3 = new javax.swing.JRadioButton();
         jRadioButton4 = new javax.swing.JRadioButton();
         jPanel2 = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
+        Z1 = new javax.swing.JLabel();
+        Z2 = new javax.swing.JLabel();
+        P = new javax.swing.JLabel();
         hitung = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -185,12 +158,12 @@ public class GUI extends javax.swing.JFrame {
         jPanel2.setBackground(new java.awt.Color(204, 204, 204));
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        jLabel5.setText("Z1 = 0");
+        Z1.setText("Z1 = 0");
 
-        jLabel6.setText("Z1 = 0");
+        Z2.setText("Z1 = 0");
 
-        jLabel7.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
-        jLabel7.setText("P = 0");
+        P.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
+        P.setText("P = 0");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -200,10 +173,10 @@ public class GUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel5)
+                        .addComponent(Z1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel6))
-                    .addComponent(jLabel7))
+                        .addComponent(Z2))
+                    .addComponent(P))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -211,10 +184,10 @@ public class GUI extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel6))
+                    .addComponent(Z1)
+                    .addComponent(Z2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel7)
+                .addComponent(P)
                 .addContainerGap(24, Short.MAX_VALUE))
         );
 
@@ -270,15 +243,34 @@ public class GUI extends javax.swing.JFrame {
         if(evt.getStateChange() == ItemEvent.SELECTED){
             X2.setEditable(true);
             X2.setBackground(Color.WHITE);
+            Z2.setVisible(true);
         }else{
             X2.setEditable(false);
             X2.setBackground(Color.GRAY);
+            Z2.setVisible(false);
         }
     }//GEN-LAST:event_jRadioButton4ItemStateChanged
 
     private void hitungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hitungActionPerformed
+       double r = R.getText().equals("") ? 0.0 : Double.parseDouble(R.getText());
+       double x1 = X1.getText().equals("") ? 0.0 : Double.parseDouble(X1.getText());
+       double x2 = X2.getText().equals("")? 0.0 : Double.parseDouble(X2.getText());
+       double s = S.getText().equals("") ? 0.0 : Double.parseDouble(S.getText());
+       
         if(jRadioButton1.isSelected()){
-            
+            Z1.setText(String.format("Z1 = %.2f", getZ(x1, r, s)));
+            P.setText(String.format("P = %.4f", getNormalProbabilityAtZ(getZ(x1, r, s),s)));
+        }else if(jRadioButton2.isSelected()){
+            System.out.print(getZ(x1, r, s));
+            Z1.setText(String.format("Z1 = %.2f", getZ(x1, r, s)));
+            P.setText(String.format("P = %.4f", getAreaUnderNormalCurve(this.minZ,getZ(x1, r, s),s)));
+        }else if(jRadioButton3.isSelected()){
+            Z1.setText(String.format("Z1 = %.2f", getZ(x1, r, s)));
+            P.setText(String.format("P = %.4f", 1 - getAreaUnderNormalCurve(this.minZ,getZ(x1, r, s),s)));
+        }else if(jRadioButton4.isSelected()){
+            Z1.setText(String.format("Z1 = %.2f", getZ(x1, r, s)));
+            Z2.setText(String.format("Z2 = %.2f", getZ(x2, r, s)));
+            P.setText(String.format("P = %.4f", getAreaUnderNormalCurve(this.minZ,getZ(x2, r, s),s) - getAreaUnderNormalCurve(this.minZ,getZ(x1, r, s),s)));
         }
     }//GEN-LAST:event_hitungActionPerformed
 
@@ -318,19 +310,19 @@ public class GUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel P;
     private javax.swing.JTextField R;
     private javax.swing.JTextField S;
     private javax.swing.JTextField X1;
     private javax.swing.JTextField X2;
+    private javax.swing.JLabel Z1;
+    private javax.swing.JLabel Z2;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton hitung;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JRadioButton jRadioButton1;
